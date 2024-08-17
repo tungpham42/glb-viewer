@@ -1,11 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { OrbitControls, useGLTF } from "@react-three/drei";
 import { Container, Row, Col, Form } from "react-bootstrap";
 
 const GLBViewer = () => {
   const [model, setModel] = useState(null);
-  const [rotation, setRotation] = useState([0, 0, 0]);
 
   const handleFileUpload = (event) => {
     const file = event.target.files[0];
