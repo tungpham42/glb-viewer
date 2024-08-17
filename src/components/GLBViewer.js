@@ -1,7 +1,10 @@
 import React, { useState, useRef } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
+import { Canvas, useFrame, extend } from "@react-three/fiber";
 import { OrbitControls, useGLTF } from "@react-three/drei";
 import { Container, Row, Col, Form, Button } from "react-bootstrap";
+import { WebGLRenderer } from "three";
+
+extend({ WebGLRenderer });
 
 const GLBViewer = () => {
   const [model, setModel] = useState(null);
@@ -35,11 +38,22 @@ const GLBViewer = () => {
       gltf.scene.rotation.y += delta * 0.5; // Adjust speed here
     });
 
-    return <primitive object={gltf.scene} scale={1} />;
+    return (
+      <>
+        <primitive object={gltf.scene} scale={1} />
+        {/* Optional: Add background plane if needed */}
+        {/* <mesh position={[0, 0, -10]} rotation={[-Math.PI / 2, 0, 0]}>
+          <planeGeometry args={[100, 100]} />
+          <meshBasicMaterial color="white" />
+        </mesh> */}
+      </>
+    );
   };
 
   const startRecording = () => {
     if (canvasRef.current) {
+      const renderer = canvasRef.current.getContext("webgl2"); // Get WebGL renderer context
+      renderer.clearColor(1, 1, 1, 1); // Set clear color to white (RGBA)
       const stream = canvasRef.current.captureStream(30); // 30 FPS
       mediaRecorderRef.current = new MediaRecorder(stream);
       mediaRecorderRef.current.ondataavailable = (event) => {
@@ -119,8 +133,11 @@ const GLBViewer = () => {
           {model && (
             <Canvas
               ref={canvasRef}
-              style={{ height: "calc(100vh - 150px)" }}
+              style={{ height: "calc(100vh - 150px)", background: "white" }}
               camera={{ position: [0, 0, 5], fov: 75 }}
+              onCreated={(state) => {
+                state.gl.setClearColor("white"); // Set clear color to white
+              }}
             >
               <ambientLight intensity={0.5} />
               <pointLight position={[10, 10, 10]} />
